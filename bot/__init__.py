@@ -70,7 +70,7 @@ class agent():
 
 
 def main():
-    a = agent('Agent/out')  # Diretório onde estão os arquivos com os modelos treinados
+    a = agent('bot/out')  # Diretório onde estão os arquivos com os modelos treinados
     print(a.jogar(10, 7))
     print(a.jogar(4, 16))
     print(a.jogar(4, 18))
