@@ -1,7 +1,7 @@
 import pickle
 import pandas as pd
 
-from tabela import v2
+from .tabela import v2
 
 # Carrega os modelos de IA assim que importado
 arvore = pickle.load(open('bot/out/arvore.pkl', 'rb'))
@@ -54,7 +54,7 @@ def jogar(dealer, player, count=None, regressao=False) -> str:
             return 'parar'
 
 def jogar_tabela(dealer, player) -> str:
-    match v2.decisao_tabela([player], dealer):
+    match v2.decisao_tabela(dealer=dealer, cartas=[player]):
         case 'P':
             return 'pedir'
     
@@ -73,7 +73,7 @@ def jogar_tabela(dealer, player) -> str:
 def main():
     print(jogar(10, 7))
     print(jogar(4, 16))
-    print(jogar_tabela(8, 16))
+    print(jogar_tabela('A', [10, 6]))
     print(jogar(5, 10))
 
 
