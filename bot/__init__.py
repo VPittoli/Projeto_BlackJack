@@ -53,8 +53,14 @@ def jogar(dealer, player, count=None, regressao=False) -> str:
         case 'S':
             return 'parar'
 
-def jogar_tabela(dealer, player) -> str:
-    match v2.decisao_tabela(dealer=dealer, cartas=[player]):
+def jogar_tabela(dealer, player, ace=False) -> str:
+    if ace:
+        player = [1, player - 11]
+    
+    else:
+        player = [player]
+
+    match v2.decisao_tabela(dealer=dealer, cartas=player):
         case 'P':
             return 'pedir'
     
