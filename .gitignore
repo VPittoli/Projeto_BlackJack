@@ -1,3 +1,2 @@
-venv/*
-Agent/blackjack_simulator.csv
-
+venv
+*.csv
