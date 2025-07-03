@@ -10,7 +10,7 @@ import bot
 valores = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'V', 'D', 'R', 'A']
 naipes = ['P', 'E', 'O', 'C']  # Paus, Espadas, Ouros, Copas
 
-def prever_jogada(mao, mao_dealer):
+def prever_jogada(mao, mao_dealer, debug=False):
     # Previsão de jogadas pela IA e pela tabela ---------------------------
 
     # Valor da mão ativa do Jogador
@@ -37,12 +37,15 @@ def prever_jogada(mao, mao_dealer):
     # Jogada prevista pela Tabela
     jogada_tabela = bot.jogar_tabela(val_dealer, val_mao_ativa, ace, dupla)
 
-    # Exibe a jogada prevista pela IA
-    # print(f'DEALER={val_dealer}, PLAYER={val_mao_ativa}, AÇÃO={bot.jogar(val_dealer, val_mao_ativa)}')
-    print(jogada_ia)
+    if debug:
+        # Exibe a jogada prevista pela IA
+        # print(f'DEALER={val_dealer}, PLAYER={val_mao_ativa}, AÇÃO={bot.jogar(val_dealer, val_mao_ativa)}')
+        print(jogada_ia)
 
-    # Exibe a jogada prevista pela Tabela
-    print(jogada_tabela)
+        # Exibe a jogada prevista pela Tabela
+        print(jogada_tabela)
+
+    return {'ia': jogada_ia, 'tabela': jogada_tabela}
 
 def calcular_valor(mao):
     total = 0
@@ -268,7 +271,7 @@ class BlackjackWindow(QWidget):
             self.label_pont_dealer.setText(f"Dealer: ? + {parcial}")
 
     def mostrar_maos(self):
-        prever_jogada(self.maos[self.mao_ativa_idx], self.mao_dealer)
+        print(prever_jogada(self.maos[self.mao_ativa_idx], self.mao_dealer))
 
         self.limpar_container(self.container_maos)
         largura_carta, altura_carta = 80, 120
