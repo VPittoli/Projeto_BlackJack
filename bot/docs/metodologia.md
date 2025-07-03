@@ -1,4 +1,6 @@
-## Metodologia
+...
+
+## MATERIAIS E MÉTODOS
 
 Para o desenvolvimento do simulador, foi utilizada a linguagem de programação
 Python na sua versão 3.13.5, com o auxílio das bibliotecas PySide 6.9.1 para a
@@ -7,6 +9,8 @@ implementação da interface gráfica, Scikit Learn 1.7.0, Pandas 2.3.0 e Numpy
 machine learning, além do uso da plataforma Jupyter Notebook para a
 visualização dos dados. Os dados de treino foram elaborados por Ho (2021),
 licensiados sob domínio público e obtidos através da plataforma Kaggle.
+
+...
 
 ### Tratamento do conjunto de dados
 
@@ -78,7 +82,11 @@ formato de arquivos PKL através do método "pickle.dump()", parte da
 biblioteca-padrão da linguagem Python, para que possa ser integrado ao
 simulador.
 
-### Resultados do Treinamento
+### RESULTADOS
+
+...
+
+## Treinamento dos Modelos de Machine Learning
 
 Após o treinamento, podemos observar a precisão dos modelos, em relação aos
 subconjuntos de dados teste, na tabela ?.
@@ -100,3 +108,11 @@ precisão do modelo de Árvore de Decisão em relação ao modelo de Regressão
 Logística proveniente da forma como estes tratam as fronteiras entre os dados.
 Uma vez que o modelo de Árvore de Decisão define as classes de forma
 determinística, e a Regressão Linear, de forma probabilística. 
+
+...
+
+## REFERÊNCIAS
+
+HO, Dennis. _50 Million Blackjack Hands_. 2021. Disponível em: https://www.kaggle.com/datasets/dennisho/blackjack-hands/. Acesso em: 13 jun. 2025.
+
+_1. Supervised Learning - scikit-learn 1.7.0 documentation_. 2025. https://scikit-learn.org/stable/supervised_learning.html. Acesso em: 3 jul. 2025.
