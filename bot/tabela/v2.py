@@ -5,6 +5,7 @@
 # Tabela completa 
 tabela = {
     # Mãos hard
+    (5, 2): 'P', (5, 3): 'P', (5, 4): 'P', (5, 5): 'P', (5, 6): 'P', (5, 7): 'P', (5, 8): 'P', (5, 9): 'P', (5, 10): 'P', (5, 11): 'P',
     (7, 2): 'P', (7, 3): 'P', (7, 4): 'P', (7, 5): 'P', (7, 6): 'P', (7, 7): 'P', (7, 8): 'P', (7, 9): 'P', (7, 10): 'P', (7, 11): 'P',
     (8, 2): 'P', (8, 3): 'P', (8, 4): 'P', (8, 5): 'DB', (8, 6): 'DB', (8, 7): 'P', (8, 8): 'P', (8, 9): 'P', (8, 10): 'P', (8, 11): 'P',
     (9, 2): 'DB', (9, 3): 'DB', (9, 4): 'DB', (9, 5): 'DB', (9, 6): 'DB', (9, 7): 'P', (9, 8): 'P', (9, 9): 'P', (9, 10): 'P', (9, 11): 'P',
@@ -63,7 +64,6 @@ def total_mao(cartas):
 def decisao_tabela(cartas, dealer):
     valor_dealer = 11 if dealer == 'A' else dealer
     chave = (total_mao(cartas), valor_dealer)
-    print(chave)
     return tabela.get(chave, 'F')  # Padrão: Ficar
 
 # --------------------------
