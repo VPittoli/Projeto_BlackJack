@@ -10,6 +10,40 @@ import bot
 valores = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'V', 'D', 'R', 'A']
 naipes = ['P', 'E', 'O', 'C']  # Paus, Espadas, Ouros, Copas
 
+def prever_jogada(mao, mao_dealer):
+    # Previsão de jogadas pela IA e pela tabela ---------------------------
+
+    # Valor da mão ativa do Jogador
+    val_mao_ativa = calcular_valor(mao)
+
+    # Valor da carta revelada do Dealer
+    val_dealer = calcular_valor([mao_dealer[0]])
+
+    ace = False
+    dupla = False
+    if len(mao) == 2:
+        # Verifica se há um Às na mão
+        for a in ('AP', 'AE', 'AO', 'AC'):
+            if a in mao:
+                ace = True
+
+        # Verifica se é uma dupla
+        if calcular_valor([mao[0]]) == calcular_valor([mao[1]]):
+            dupla = True
+
+    # Jogada prevista pela IA
+    jogada_ia = bot.jogar(val_dealer, val_mao_ativa)
+
+    # Jogada prevista pela Tabela
+    jogada_tabela = bot.jogar_tabela(val_dealer, val_mao_ativa, ace, dupla)
+
+    # Exibe a jogada prevista pela IA
+    # print(f'DEALER={val_dealer}, PLAYER={val_mao_ativa}, AÇÃO={bot.jogar(val_dealer, val_mao_ativa)}')
+    print(jogada_ia)
+
+    # Exibe a jogada prevista pela Tabela
+    print(jogada_tabela)
+
 def calcular_valor(mao):
     total = 0
     ases = 0
@@ -234,40 +268,7 @@ class BlackjackWindow(QWidget):
             self.label_pont_dealer.setText(f"Dealer: ? + {parcial}")
 
     def mostrar_maos(self):
-        # Previsão de jogadas pela IA e pela tabela ---------------------------
-
-        # Valor da mão ativa do Jogador
-        val_mao_ativa = calcular_valor(self.maos[self.mao_ativa_idx])
-
-        # Valor da carta revelada do Dealer
-        val_dealer = calcular_valor([self.mao_dealer[0]])
-
-        ace = False
-        dupla = False
-        if len(self.maos[self.mao_ativa_idx]) == 2:
-            # Verifica se há um Às na mão
-            for a in ('AP', 'AE', 'AO', 'AC'):
-                if a in self.maos[self.mao_ativa_idx]:
-                    ace = True
-
-            # Verifica se é uma dupla
-            if calcular_valor([self.maos[self.mao_ativa_idx][0]]) == calcular_valor([self.maos[self.mao_ativa_idx][1]]):
-                dupla = True
-
-        # Jogada prevista pela IA
-        jogada_ia = bot.jogar(val_dealer, val_mao_ativa)
-
-        # Jogada prevista pela Tabela
-        jogada_tabela = bot.jogar_tabela(val_dealer, val_mao_ativa, ace, dupla)
-
-        # Exibe a jogada prevista pela IA
-        # print(f'DEALER={val_dealer}, PLAYER={val_mao_ativa}, AÇÃO={bot.jogar(val_dealer, val_mao_ativa)}')
-        print(jogada_ia)
-
-        # Exibe a jogada prevista pela Tabela
-        print(jogada_tabela)
-
-        # ---------------------------------------------------------------------
+        prever_jogada(self.maos[self.mao_ativa_idx], self.mao_dealer)
 
         self.limpar_container(self.container_maos)
         largura_carta, altura_carta = 80, 120
