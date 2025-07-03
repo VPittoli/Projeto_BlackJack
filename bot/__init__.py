@@ -53,10 +53,16 @@ def jogar(dealer, player, count=None, regressao=False) -> str:
         case 'S':
             return 'parar'
 
-def jogar_tabela(dealer, player, ace=False) -> str:
-    if ace:
-        player = [1, player - 11]
-    
+def jogar_tabela(dealer, player, ace=False, dupla=False) -> str:
+    if dupla and not ace:
+        player = [int(player / 2), int(player / 2)]
+
+    elif dupla and ace:
+        player = [1, 1]
+
+    elif ace:
+        player = [1, player-11]
+
     else:
         player = [player]
 

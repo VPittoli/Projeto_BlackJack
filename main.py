@@ -242,18 +242,23 @@ class BlackjackWindow(QWidget):
         # Valor da carta revelada do Dealer
         val_dealer = calcular_valor([self.mao_dealer[0]])
 
-        # Verifica se há um Às na mão
         ace = False
-        
-        for a in ('AP', 'AE', 'AO', 'AC'):
-            if a in self.maos[self.mao_ativa_idx]:
-                ace = True
+        dupla = False
+        if len(self.maos[self.mao_ativa_idx]) == 2:
+            # Verifica se há um Às na mão
+            for a in ('AP', 'AE', 'AO', 'AC'):
+                if a in self.maos[self.mao_ativa_idx]:
+                    ace = True
+
+            # Verifica se é uma dupla
+            if calcular_valor([self.maos[self.mao_ativa_idx][0]]) == calcular_valor([self.maos[self.mao_ativa_idx][1]]):
+                dupla = True
 
         # Jogada prevista pela IA
         jogada_ia = bot.jogar(val_dealer, val_mao_ativa)
 
         # Jogada prevista pela Tabela
-        jogada_tabela = bot.jogar_tabela(val_dealer, val_mao_ativa, ace)
+        jogada_tabela = bot.jogar_tabela(val_dealer, val_mao_ativa, ace, dupla)
 
         # Exibe a jogada prevista pela IA
         # print(f'DEALER={val_dealer}, PLAYER={val_mao_ativa}, AÇÃO={bot.jogar(val_dealer, val_mao_ativa)}')
