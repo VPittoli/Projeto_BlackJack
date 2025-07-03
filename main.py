@@ -262,8 +262,6 @@ class BlackjackWindow(QWidget):
         # Exibe a jogada prevista pela Tabela
         print(jogada_tabela)
 
-        print(f'{ace} {val_mao_ativa}')
-
         # ---------------------------------------------------------------------
 
         self.limpar_container(self.container_maos)
