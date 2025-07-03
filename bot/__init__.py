@@ -80,7 +80,7 @@ def jogar_tabela(dealer, player, ace=False, dupla=False) -> str:
             return 'split'
         
         case 'P/D':
-            return 'pedir ou ficar'
+            return 'pedir ou parar'
 
 def main():
     print(jogar(10, 7))

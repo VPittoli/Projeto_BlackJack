@@ -63,7 +63,8 @@ def total_mao(cartas):
 def decisao_tabela(cartas, dealer):
     valor_dealer = 11 if dealer == 'A' else dealer
     chave = (total_mao(cartas), valor_dealer)
-    return tabela.get(chave, 'FP')  # Padrão: Ficar
+    print(chave)
+    return tabela.get(chave, 'F')  # Padrão: Ficar
 
 # --------------------------
 # EXEMPLOS DE USO
