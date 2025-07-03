@@ -52,7 +52,11 @@ def total_mao(cartas):
     if tipo_mao(cartas) == 'soft':
         return f"A,{total - 1}"  # Exemplo: A,6 para A+6
     elif tipo_mao(cartas) == 'par':
-        return f"{cartas[0]},{cartas[1]}"
+        if cartas[0] == 1:
+            return 'A,A'
+        
+        else:
+            return f"{cartas[0]},{cartas[1]}"
     else:
         return total
 
