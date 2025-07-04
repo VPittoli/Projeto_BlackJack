@@ -250,9 +250,42 @@ class Menu5(QWidget):
         titulo.setTextFormat(Qt.TextFormat.RichText)
         layout.addWidget(titulo)
 
-        descricao = QLabel("Aqui será exibida a sugestão com base na regressão logística.")
-        descricao.setWordWrap(True)
-        layout.addWidget(descricao)
+        mao_jogador_valores = converter_mao_para_valores(mao_jogador)
+        dealer_val = converter_mao_para_valores(mao_dealer)[0]
+
+        soma_jogador = valor_mao(mao_jogador_valores)
+
+        label_info = QLabel(f"<b>Mão do Jogador:</b> {soma_jogador} | <b>Dealer mostra:</b> {dealer_val}")
+        label_info.setTextFormat(Qt.TextFormat.RichText)
+        layout.addWidget(label_info)
+
+        acao = bot.jogar(dealer_val, soma_jogador, regressao=True)
+
+        label_acao = QLabel(f"Ação recomendada: <b>{acao}</b>")
+        label_acao.setTextFormat(Qt.TextFormat.RichText)
+        layout.addWidget(label_acao)
+
+        probabilidades = bot.jogar(dealer_val, soma_jogador, regressao=True, proba=True)
+
+        for p in probabilidades:
+            t = ''
+            
+            match p:
+                case 'H':
+                    t += 'HIT'
+
+                case 'D':
+                    t += 'DOUBLE'
+                    
+                case 'P':
+                    t += 'SPLIT'
+                    
+                case 'S':
+                    t += 'STAND'
+
+            l = QLabel(f"<br><b>Ação</b>: {t}<b><br> {float(probabilidades[p]):.02f} %")
+            l.setTextFormat(Qt.TextFormat.RichText)
+            layout.addWidget(l)
 
         layout.addStretch()
         self.setLayout(layout)
