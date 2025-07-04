@@ -134,6 +134,8 @@ class BlackjackWindow(QWidget):
         self.apostas_maos = [self.aposta]
 
         self.menu = None  # Janela do menu de dicas
+        self.historico_undo = []
+        self.historico_redo = []
 
         self.nova_partida()
 
@@ -299,13 +301,15 @@ class BlackjackWindow(QWidget):
         mao = self.maos[self.mao_ativa_idx]
         if len(mao) == 2 and not self.mao_ativa_terminada and len(self.maos) < 4:
             r1, r2 = mao[0][:-1], mao[1][:-1]
-            face10 = ['10', 'V', 'D', 'R']
-            return r1 == r2 or (r1 in face10 and r2 in face10)
+            grupo_10 = ['10', 'V', 'D', 'R']
+            return (r1 == r2) or (r1 in grupo_10 and r2 in grupo_10)
         return False
+
 
     def pedir_carta(self):
         if self.mao_ativa_terminada:
             return
+        self.salvar_estado()  # Salva o estado antes da ação
         if not self.deck:
             self.reembaralhar_deck()
 
@@ -348,6 +352,16 @@ class BlackjackWindow(QWidget):
             return
         if len(self.maos) >= 4:
             return
+        if self.fichas < self.aposta:
+            self.label_resultado.setText("Fichas insuficientes para Split.")
+            return
+        self.salvar_estado()  # Salva o estado antes da ação
+
+        self.fichas -= self.aposta  # Deduz a aposta extra para o split
+        self.atualizar_label_fichas()
+        self.label_ganho.setStyleSheet("color: red; font-size: 14px; font-weight: bold; background-color: rgba(0,0,0,0.6); padding: 3px; border-radius: 5px;")
+        self.label_ganho.setText(f"-{self.aposta}")
+        QTimer.singleShot(5000, lambda: self.label_ganho.setText(""))
 
         mao_atual = self.maos[self.mao_ativa_idx]
         carta1 = mao_atual[0]
@@ -358,33 +372,35 @@ class BlackjackWindow(QWidget):
         if not self.deck:
             self.reembaralhar_deck()
 
-        # Atualizar a mão dividida
+        # Primeira mão fica com 2 cartas normalmente
         self.maos[self.mao_ativa_idx] = [carta1, self.deck.pop()]
-        nova_mao = [carta2, self.deck.pop()]
+        # Segunda mão começa apenas com 1 carta, a carta original, a segunda carta será dada quando for a vez dela
+        nova_mao = [carta2]
         self.maos.insert(self.mao_ativa_idx + 1, nova_mao)
 
-        # Inserir False para ambas
         self.jogador_estourou[self.mao_ativa_idx] = False
         self.jogador_estourou.insert(self.mao_ativa_idx + 1, False)
 
         self.mostrar_maos()
         self.btn_split.setEnabled(False)
-        self.btn_double.setEnabled(True)  # Habilitar double para nova mão se necessário
+        self.btn_double.setEnabled(True)
 
         if self.menu and self.menu.isVisible():
             self.menu.atualizar_maos(self.maos, self.mao_dealer, self.mao_ativa_idx)
 
 
+
+
     def fazer_double(self):
         if self.mao_ativa_terminada:
             return
-
         if len(self.maos[self.mao_ativa_idx]) != 2:
             return
-
         if self.fichas < self.aposta:
             self.label_resultado.setText("Fichas insuficientes para Double.")
             return
+
+        self.salvar_estado()  # Salva o estado antes da ação
 
         self.fichas -= self.aposta
         self.atualizar_label_fichas()
@@ -396,7 +412,7 @@ class BlackjackWindow(QWidget):
             self.reembaralhar_deck()
 
         self.maos[self.mao_ativa_idx].append(self.deck.pop())
-        self.apostas_maos[self.mao_ativa_idx] += self.aposta  # dobra aposta
+        self.apostas_maos[self.mao_ativa_idx] += self.aposta
 
         self.mostrar_maos()
         self.atualizar_label_deck()
@@ -417,7 +433,10 @@ class BlackjackWindow(QWidget):
 
         self.proxima_mao()
 
+
     def parar_vez(self):
+        self.salvar_estado()  # Salva o estado antes da ação
+
         self.mao_ativa_terminada = True
         self.btn_pedir.setEnabled(False)
         self.btn_parar.setEnabled(False)
@@ -429,10 +448,18 @@ class BlackjackWindow(QWidget):
 
         self.proxima_mao()
 
+
     def proxima_mao(self):
         if self.mao_ativa_idx + 1 < len(self.maos):
             self.mao_ativa_idx += 1
             self.mao_ativa_terminada = False
+
+            # Se a nova mão tiver apenas 1 carta, dar a segunda carta agora
+            if len(self.maos[self.mao_ativa_idx]) == 1:
+                if not self.deck:
+                    self.reembaralhar_deck()
+                self.maos[self.mao_ativa_idx].append(self.deck.pop())
+
             self.mostrar_maos()
             self.btn_pedir.setEnabled(True)
             self.btn_parar.setEnabled(True)
@@ -443,6 +470,7 @@ class BlackjackWindow(QWidget):
                 self.menu.atualizar_maos(self.maos, self.mao_dealer, self.mao_ativa_idx)
         else:
             self.jogada_dealer()
+
 
     def jogada_dealer(self):
         if all(self.jogador_estourou):
@@ -519,9 +547,86 @@ class BlackjackWindow(QWidget):
     def atualizar_label_deck(self):
         # Você pode mostrar quantas cartas restam, se quiser
         pass
+    
+    def salvar_estado(self):
+        import copy
+        estado = {
+            "deck": copy.deepcopy(self.deck),
+            "maos": copy.deepcopy(self.maos),
+            "mao_dealer": copy.deepcopy(self.mao_dealer),
+            "mao_ativa_idx": self.mao_ativa_idx,
+            "mao_ativa_terminada": self.mao_ativa_terminada,
+            "fichas": self.fichas,
+            "apostas_maos": copy.deepcopy(self.apostas_maos),
+            "jogador_estourou": copy.deepcopy(self.jogador_estourou),
+            "carta_revelada": self.carta_revelada
+        }
+        self.historico_undo.append(estado)
+        self.historico_redo.clear()
+    
+    def restaurar_estado(self, estado):
+        import copy
+        self.deck = copy.deepcopy(estado["deck"])
+        self.maos = copy.deepcopy(estado["maos"])
+        self.mao_dealer = copy.deepcopy(estado["mao_dealer"])
+        self.mao_ativa_idx = estado["mao_ativa_idx"]
+        self.mao_ativa_terminada = estado["mao_ativa_terminada"]
+        self.fichas = estado["fichas"]
+        self.apostas_maos = copy.deepcopy(estado["apostas_maos"])
+        self.jogador_estourou = copy.deepcopy(estado["jogador_estourou"])
+        self.carta_revelada = estado.get("carta_revelada", False)
+
+        # Reexibe tudo
+        self.mostrar_maos()
+        self.mostrar_cartas(self.mao_dealer, self.container_dealer, hide_second=not self.carta_revelada)
+        self.atualizar_label_fichas()
+        self.label_resultado.setText("")
+        self.label_ganho.setText("")
+
+        # Corrige botões com base no novo estado
+        if self.mao_ativa_terminada or self.jogador_estourou[self.mao_ativa_idx]:
+            self.btn_pedir.setEnabled(False)
+            self.btn_parar.setEnabled(False)
+            self.btn_split.setEnabled(False)
+            self.btn_double.setEnabled(False)
+        else:
+            self.btn_pedir.setEnabled(True)
+            self.btn_parar.setEnabled(True)
+            self.btn_split.setEnabled(self.pode_split())
+            self.btn_double.setEnabled(True)
+
+        self.btn_nova.setEnabled(False)  # Só habilita manualmente após dealer
+
+        if self.menu and self.menu.isVisible():
+            self.menu.atualizar_maos(self.maos, self.mao_dealer, self.mao_ativa_idx)
+
+        
+    def desfazer(self):
+        if not self.historico_undo:
+            return
+        estado_atual = {
+            "deck": self.deck,
+            "maos": self.maos,
+            "mao_dealer": self.mao_dealer,
+            "mao_ativa_idx": self.mao_ativa_idx,
+            "mao_ativa_terminada": self.mao_ativa_terminada,
+            "fichas": self.fichas,
+            "apostas_maos": self.apostas_maos,
+            "jogador_estourou": self.jogador_estourou,
+            "carta_revelada": self.carta_revelada
+        }
+        self.historico_redo.append(estado_atual)
+        estado_anterior = self.historico_undo.pop()
+        self.restaurar_estado(estado_anterior)
+        
+
+
+
 
     def keyPressEvent(self, event: QKeyEvent):
-        if event.key() == Qt.Key.Key_H:
+        if event.key() == Qt.Key.Key_A:
+            self.desfazer()
+        elif event.key() == Qt.Key.Key_H:
             if self.menu is None:
                 self.menu = MainWindow(self.maos, self.mao_dealer, self.mao_ativa_idx)
             self.menu.show()
