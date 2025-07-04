@@ -42,16 +42,16 @@ def jogar(dealer, player, count=None, regressao=False) -> str:
         
     match r:
         case 'H':
-            return 'pedir'
+            return 'HIT'
 
         case 'D':
-            return 'double'
+            return 'DOUBLE'
             
         case 'P':
-            return 'split'
+            return 'SPLIT'
             
         case 'S':
-            return 'parar'
+            return 'STAND'
 
 def jogar_tabela(dealer, player, ace=False, dupla=False) -> str:
     if dupla and not ace:
@@ -68,19 +68,19 @@ def jogar_tabela(dealer, player, ace=False, dupla=False) -> str:
 
     match v2.decisao_tabela(dealer=dealer, cartas=player):
         case 'P':
-            return 'pedir'
+            return 'HIT'
     
         case 'DB':
-            return 'double'
+            return 'DOUBLE'
 
         case 'F':
-            return 'parar'
+            return 'STAND'
 
         case 'D':
-            return 'split'
+            return 'SPLIT'
         
         case 'P/D':
-            return 'pedir ou parar'
+            return 'HIT ou STAND'
 
 def main():
     print(jogar(10, 7))
