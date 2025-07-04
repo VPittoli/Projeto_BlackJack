@@ -42,12 +42,18 @@ class TelaInicial(QWidget):
         label_tabela.setTextFormat(Qt.TextFormat.RichText)
         layout.addWidget(label_tabela)
 
-        acao_tabela_internet = bot.jogar_tabela(dealer_carta_visivel_valor, valor_mao(mao_jogador_valores))
+        ace = 1 in mao_jogador_valores or 11 in mao_jogador_valores
+        dupla = False
+        for n in mao_jogador_valores:
+            if mao_jogador_valores.count(n) > 1:
+                dupla = True
+
+        acao_tabela_internet = bot.jogar_tabela(dealer=dealer_carta_visivel_valor, player=valor_mao(mao_jogador_valores), ace=ace, dupla=dupla)
         label_tabela_internet = QLabel(f'<b>Tabela da Internet:</b> {acao_tabela_internet}')
         label_tabela_internet.setTextFormat(Qt.TextFormat.RichText)
         layout.addWidget(label_tabela_internet)
 
-        acao_arvore = bot.jogar(dealer_carta_visivel_valor, valor_mao(mao_jogador_valores))
+        acao_arvore = bot.jogar(dealer=dealer_carta_visivel_valor, player=valor_mao(mao_jogador_valores))
         label_arvore = QLabel(f'<b>Arvore de Decisão:</b> {acao_arvore}')
         label_arvore.setTextFormat(Qt.TextFormat.RichText)
         layout.addWidget(label_arvore)
@@ -156,9 +162,30 @@ class Menu3(QWidget):
         titulo.setTextFormat(Qt.TextFormat.RichText)
         layout.addWidget(titulo)
 
-        descricao = QLabel("Aqui será exibida a recomendação baseada na tabela padrão da internet.")
-        descricao.setWordWrap(True)
-        layout.addWidget(descricao)
+        mao_jogador_valores = converter_mao_para_valores(mao_jogador)
+        dealer_val = converter_mao_para_valores(mao_dealer)[0]
+
+        ace = 1 in mao_jogador_valores or 11 in mao_jogador_valores
+        dupla = False
+        for n in mao_jogador_valores:
+            if mao_jogador_valores.count(n) > 1:
+                dupla = True
+
+        soma_jogador = valor_mao(mao_jogador_valores)
+
+        label_info = QLabel(f"<b>Mão do Jogador:</b> {soma_jogador} | <b>Dealer mostra:</b> {dealer_val}")
+        label_info.setTextFormat(Qt.TextFormat.RichText)
+        layout.addWidget(label_info)
+
+        label_dados = QLabel(f"<b>É soft?</b> {'Sim' if ace else 'Não'} | <b>É um par?</b> {'Sim' if dupla else 'Não'}")
+        label_dados.setTextFormat(Qt.TextFormat.RichText)
+        layout.addWidget(label_dados)
+
+        acao = bot.jogar_tabela(dealer_val, soma_jogador, ace, dupla)
+
+        label_acao = QLabel(f"Ação recomendada: <b>{acao}</b>")
+        label_acao.setTextFormat(Qt.TextFormat.RichText)
+        layout.addWidget(label_acao)
 
         layout.addStretch()
         self.setLayout(layout)
@@ -173,9 +200,42 @@ class Menu4(QWidget):
         titulo.setTextFormat(Qt.TextFormat.RichText)
         layout.addWidget(titulo)
 
-        descricao = QLabel("Aqui será exibida a decisão baseada em árvore de decisão treinada.")
-        descricao.setWordWrap(True)
-        layout.addWidget(descricao)
+        mao_jogador_valores = converter_mao_para_valores(mao_jogador)
+        dealer_val = converter_mao_para_valores(mao_dealer)[0]
+
+        soma_jogador = valor_mao(mao_jogador_valores)
+
+        label_info = QLabel(f"<b>Mão do Jogador:</b> {soma_jogador} | <b>Dealer mostra:</b> {dealer_val}")
+        label_info.setTextFormat(Qt.TextFormat.RichText)
+        layout.addWidget(label_info)
+
+        acao = bot.jogar(dealer_val, soma_jogador)
+
+        label_acao = QLabel(f"Ação recomendada: <b>{acao}</b>")
+        label_acao.setTextFormat(Qt.TextFormat.RichText)
+        layout.addWidget(label_acao)
+
+        probabilidades = bot.jogar(dealer_val, soma_jogador, proba=True)
+
+        for p in probabilidades:
+            t = ''
+            
+            match p:
+                case 'H':
+                    t += 'HIT'
+
+                case 'D':
+                    t += 'DOUBLE'
+                    
+                case 'P':
+                    t += 'SPLIT'
+                    
+                case 'S':
+                    t += 'STAND'
+
+            l = QLabel(f"<br><b>Ação</b>: {t}<b><br> {float(probabilidades[p]):.02f} %")
+            l.setTextFormat(Qt.TextFormat.RichText)
+            layout.addWidget(l)
 
         layout.addStretch()
         self.setLayout(layout)
